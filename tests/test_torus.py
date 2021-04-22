@@ -32,5 +32,25 @@ def test_torus_encoding(r, log2_p):
     assert equal_torus_elem(result, r)
 
 
+@pytest.mark.parametrize(
+    "data_range",
+    [
+        (0, 2),
+        (-2, 1),
+        (-5.5, -4),
+        (-3.1, 3.5),
+        (0.2, 1.4),
+    ],
+)
+@pytest.mark.parametrize("log2_p", [3, 5, 8, 16, 32, 63])
+def test_float_encoding(data_range, log2_p):
+    p = 2 ** log2_p
+    r = np.random.uniform(*data_range, size=(1)).item()
+    u = Torus.from_float(r, p, data_range)
+    result = u.to_float(p, data_range)
+    precision = (data_range[1] - data_range[0]) / p
+    assert np.allclose(result, r, atol=precision)
+
+
 # TODO:
 # test add/sub/mul with different encodings

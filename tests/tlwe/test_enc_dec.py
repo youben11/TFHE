@@ -39,3 +39,27 @@ def test_tlwe_enc_dec_int(i, n, sigma):
     c.encrypt(sk, u)
     result = c.decrypt(sk).to_int(p)
     assert result == i
+
+
+@pytest.mark.parametrize(
+    "data_range",
+    [
+        (0, 2),
+        (-2, 1),
+        (-5.5, -4),
+        (-3.1, 3.5),
+        (0.2, 1.4),
+    ],
+)
+@pytest.mark.parametrize("n", [600, 800, 1024, 2048])
+@pytest.mark.parametrize("sigma", [2 ** -15, 2 ** -30])
+def test_tlwe_enc_dec_float(data_range, n, sigma):
+    p = 2 ** 8
+    f = np.random.uniform(*data_range, size=(1)).item()
+    u = Torus.from_float(f, p, data_range)
+    sk = LWESecretKey(n)
+    c = TLWE(n, sigma, p)
+    c.encrypt(sk, u)
+    result = c.decrypt(sk).to_float(p, data_range)
+    precision = (data_range[1] - data_range[0]) / p
+    assert np.allclose(result, f, atol=precision)
