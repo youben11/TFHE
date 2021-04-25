@@ -50,7 +50,7 @@ class Torus:
                 f"Warning: value {value} is not in the range [0, p), it will be converted into an integer modulo p = {value % p}"
             )
         value = int(value % p)
-        return Torus(value * (cls.q / p) % cls.q)
+        return Torus((value * (cls.q / p)) % cls.q)
 
     def to_int(self, p):
         """
@@ -83,7 +83,7 @@ class Torus:
         value = float((value - offset) % delta)
         step = delta / p
         int_value = round(value / step) % p
-        return Torus(int_value * (cls.q / p) % cls.q)
+        return Torus((int_value * (cls.q / p)) % cls.q)
 
     def to_float(self, p, data_range):
         """
