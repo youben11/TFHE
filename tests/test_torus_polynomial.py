@@ -96,8 +96,36 @@ def test_torus_polynomial_float_encoding_batched(data_range, log2_p, big_n):
     precision = (data_range[1] - data_range[0]) / p
     assert len(result) == big_n
     for i in range(big_n):
-        assert equal_torus_elem(result[i], r, atol=precision, min=data_range[0], max=data_range[1])
+        assert equal_torus_elem(
+            result[i], r, atol=precision, min=data_range[0], max=data_range[1]
+        )
 
 
 # TODO:
 # test add/sub/mul with different encodings
+
+
+@pytest.mark.parametrize("r1", np.arange(0, 1, 0.1).tolist())
+@pytest.mark.parametrize("r2", np.arange(0, 1, 0.1).tolist())
+@pytest.mark.parametrize("big_n", [2 ** 10, 2 ** 9, 2 ** 12])
+def test_torus_polynomial_add_batched(r1, r2, big_n):
+    p = 2 ** 16
+    u1 = TorusPolynomial.from_real([r1] * big_n, big_n)
+    u2 = TorusPolynomial.from_real([r2] * big_n, big_n)
+    result = (u1 + u2).to_real(p)
+    assert len(result) == big_n
+    for i in range(big_n):
+        assert equal_torus_elem(result[i], (r1 + r2) % 1)
+
+
+@pytest.mark.parametrize("r1", np.arange(0, 1, 0.1).tolist())
+@pytest.mark.parametrize("r2", np.arange(0, 1, 0.1).tolist())
+@pytest.mark.parametrize("big_n", [2 ** 10, 2 ** 9, 2 ** 12])
+def test_torus_polynomial_sub_batched(r1, r2, big_n):
+    p = 2 ** 16
+    u1 = TorusPolynomial.from_real([r1] * big_n, big_n)
+    u2 = TorusPolynomial.from_real([r2] * big_n, big_n)
+    result = (u1 - u2).to_real(p)
+    assert len(result) == big_n
+    for i in range(big_n):
+        assert equal_torus_elem(result[i], (r1 - r2) % 1)

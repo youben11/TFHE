@@ -160,8 +160,10 @@ class TorusPolynomial:
                 raise ValueError(
                     f"Polynomial modulus degree don't match {self.big_n} and {other.big_n}"
                 )
+            rs = self.data.tolist() + [0] * (self.big_n - len(self.data))
+            ls = other.data.tolist() + [0] * (self.big_n - len(other.data))
             return TorusPolynomial(
-                poly.polyadd(self.data, other.data), big_n=self.big_n
+                [(x + y) % self.q for x, y in zip(rs, ls)], big_n=self.big_n
             )
         else:
             raise TypeError(
@@ -177,8 +179,10 @@ class TorusPolynomial:
                 raise ValueError(
                     f"Polynomial modulus degree don't match {self.big_n} and {other.big_n}"
                 )
+            rs = self.data.tolist() + [0] * (self.big_n - len(self.data))
+            ls = other.data.tolist() + [0] * (self.big_n - len(other.data))
             return TorusPolynomial(
-                poly.polysub(self.data, other.data), big_n=self.big_n
+                [(x - y) % self.q for x, y in zip(rs, ls)], big_n=self.big_n
             )
         else:
             raise TypeError(
@@ -191,8 +195,10 @@ class TorusPolynomial:
                 raise ValueError(
                     f"Polynomial modulus degree don't match {self.big_n} and {other.big_n}"
                 )
+            rs = other.data.tolist() + [0] * (self.big_n - len(other.data))
+            ls = self.data.tolist() + [0] * (self.big_n - len(self.data))
             return TorusPolynomial(
-                poly.polysub(other.data, self.data), big_n=self.big_n
+                [(x - y) % self.q for x, y in zip(rs, ls)], big_n=self.big_n
             )
         else:
             raise TypeError(
