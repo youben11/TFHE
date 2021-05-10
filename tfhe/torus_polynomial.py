@@ -36,10 +36,10 @@ class TorusPolynomial:
             values = [values]
         coeffs = []
         for value in values:
-            if value < 0 or value >= 1:
-                print(
-                    f"Warning: value {value} is not in the range [0, 1), it will be converted into a real modulo 1 = {value % 1}"
-                )
+            # if value < 0 or value >= 1:
+            #     print(
+            #         f"Warning: value {value} is not in the range [0, 1), it will be converted into a real modulo 1 = {value % 1}"
+            #     )
             value = value % 1
             coeffs.append((value * cls.q) % cls.q)
         if big_n is None:

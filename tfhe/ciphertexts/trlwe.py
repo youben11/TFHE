@@ -14,8 +14,7 @@ class RLWESecretKey:
         self.big_n = big_n
         self.k = k
         self.data = [
-            [np.random.randint(0, 2, dtype=np.uint64) for _ in range(big_n)]
-            for _ in range(k)
+            np.random.randint(0, 2, size=big_n, dtype=np.uint64) for _ in range(k)
         ]
 
     def bits_at(self, k):
@@ -72,9 +71,7 @@ class TRLWE:
         for i in range(self.k):
             sk_bits = sk.bits_at(i)
             ak = self.mask[i].data
-            coeffs = []
-            for sj, aj in zip(sk_bits, ak):
-                coeffs.append(sj * aj)
+            coeffs = [s * a for s, a in zip(sk_bits, ak)]
             encrypted_mask += TorusPolynomial(coeffs, big_n=self.big_n)
 
         e = self.randn(self.big_n, self.sigma)
@@ -86,14 +83,12 @@ class TRLWE:
         """
         if self.mask is None:
             raise RuntimeError("nothing is encrypted")
-        
+
         encrypted_mask = TorusPolynomial([0], big_n=self.big_n)
         for i in range(self.k):
             sk_bits = sk.bits_at(i)
             ak = self.mask[i].data
-            coeffs = []
-            for sj, aj in zip(sk_bits, ak):
-                coeffs.append(sj * aj)
+            coeffs = [s * a for s, a in zip(sk_bits, ak)]
             encrypted_mask += TorusPolynomial(coeffs, big_n=self.big_n)
 
         u_noisy = self.b - encrypted_mask
@@ -117,41 +112,41 @@ class TRLWE:
         return True
 
     def __add__(self, other):
-        if isinstance(other, TLWE):
+        if isinstance(other, TRLWE):
             if not self.have_same_param(other):
-                raise ValueError("addition need to be done on TLWE of same parameters")
+                raise ValueError("addition need to be done on TRLWE of same parameters")
             res = self.copy()
-            for i in range(len(res.mask)):
-                res.mask[i] += other.mask[i]
-            res.b += other.b
+            for i in range(self.k):
+                res.mask[i] = self.mask[i] + other.mask[i]
+            res.b = self.b + other.b
             return res
-        elif isinstance(other, Torus):
+        elif isinstance(other, TorusPolynomial):
             res = self.copy()
             res.b += other
             return res
         else:
-            raise TypeError(f"don't support addition of TLWE with {type(other)}")
+            raise TypeError(f"don't support addition of TRLWE with {type(other)}")
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        if isinstance(other, TLWE):
+        if isinstance(other, TRLWE):
             if not self.have_same_param(other):
                 raise ValueError(
-                    "subtraction need to be done on TLWE of same parameters"
+                    "subtraction need to be done on TRLWE of same parameters"
                 )
             res = self.copy()
-            for i in range(len(res.mask)):
+            for i in range(self.k):
                 res.mask[i] -= other.mask[i]
             res.b -= other.b
             return res
-        elif isinstance(other, Torus):
+        elif isinstance(other, TorusPolynomial):
             res = self.copy()
             res.b -= other
             return res
         else:
-            raise TypeError(f"don't support addition of TLWE with {type(other)}")
+            raise TypeError(f"don't support addition of TRLWE with {type(other)}")
 
     def __rsub__(self, other):
         # TODO: negate first maybe?
@@ -165,7 +160,7 @@ class TRLWE:
                 res.mask[i] *= other
             return res
         else:
-            raise TypeError(f"don't support multiplication of TLWE with {type(other)}")
+            raise TypeError(f"don't support multiplication of TRLWE with {type(other)}")
 
     def __rmul__(self, other):
         return self.__mul__(other)
