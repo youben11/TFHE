@@ -1,6 +1,7 @@
 import numpy as np
 from tfhe.ciphertexts.ciphertext import Ciphertext
 from tfhe.torus_polynomial import TorusPolynomial
+from tfhe.poly import polymul
 
 
 class RLWESecretKey:
@@ -71,7 +72,7 @@ class TRLWE:
         for i in range(self.k):
             sk_bits = sk.bits_at(i)
             ak = self.mask[i].data
-            coeffs = [s * a for s, a in zip(sk_bits, ak)]
+            coeffs = polymul(sk_bits, ak)
             encrypted_mask += TorusPolynomial(coeffs, big_n=self.big_n)
 
         e = self.randn(self.big_n, self.sigma)
@@ -88,7 +89,7 @@ class TRLWE:
         for i in range(self.k):
             sk_bits = sk.bits_at(i)
             ak = self.mask[i].data
-            coeffs = [s * a for s, a in zip(sk_bits, ak)]
+            coeffs = polymul(sk_bits, ak)
             encrypted_mask += TorusPolynomial(coeffs, big_n=self.big_n)
 
         u_noisy = self.b - encrypted_mask

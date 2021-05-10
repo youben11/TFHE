@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.polynomial import polynomial as poly
+from tfhe.poly import polymod
 
 
 class TorusPolynomial:
@@ -19,8 +19,7 @@ class TorusPolynomial:
         self._apply_poly_mod()
 
     def _apply_poly_mod(self):
-        poly_mod = [1] + [0] * (self.big_n - 1) + [1]
-        self.data = np.uint64(poly.polydiv(np.int64(self.data), poly_mod)[1])
+        self.data = polymod(self.data, self.big_n, self.q)
 
     def copy(self):
         new = TorusPolynomial(self.data.copy(), big_n=self.big_n)
