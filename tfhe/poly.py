@@ -8,9 +8,11 @@ def _get_pmod_from_big_n(big_n=1024):
 
 
 def polymod(p, big_n, q=2 ** 64):
+    # TODO: compute polymod using rotate and negate
     poly_mod = _get_pmod_from_big_n(big_n)
     return np.uint64(poly.polydiv(np.int64(p), poly_mod)[1])
 
 
 def polymul(p1, p2, q=2 ** 64):
+    # TODO: use old polu API of numpy to compute polymul with uint64
     return np.uint64([s * a for s, a in zip(p1, p2)])
